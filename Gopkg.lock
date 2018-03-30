@@ -7,9 +7,39 @@
   revision = "8b8815536531fec28e58df00e880c9103c90ddb6"
   version = "1.0.1"
 
+[[projects]]
+  name = "github.com/fatih/color"
+  packages = ["."]
+  revision = "507f6050b8568533fb3f5504de8e5205fa62a114"
+  version = "v1.6.0"
+
+[[projects]]
+  branch = "master"
+  name = "github.com/hokaccha/go-prettyjson"
+  packages = ["."]
+  revision = "e6b9231a2b1cc5798b336fdbf99c16cd8ad1e0c9"
+
+[[projects]]
+  name = "github.com/mattn/go-colorable"
+  packages = ["."]
+  revision = "167de6bfdfba052fa6b2d3664c8f5272e23c9072"
+  version = "v0.0.9"
+
+[[projects]]
+  name = "github.com/mattn/go-isatty"
+  packages = ["."]
+  revision = "0360b2af4f38e8d38c7fce2a9f4e702702d73a39"
+  version = "v0.0.3"
+
+[[projects]]
+  branch = "master"
+  name = "golang.org/x/sys"
+  packages = ["unix"]
+  revision = "378d26f46672a356c46195c28f61bdb4c0a781dd"
+
 [solve-meta]
   analyzer-name = "dep"
   analyzer-version = 1
-  inputs-digest = "6e849e70a37ae5e6b3e6818d158f5d3c2160f1f82b6bf63e2c27196d5595b00d"
+  inputs-digest = "c02a636d18b2ff5bd1c1b17b2dde6ea1cd4d608dbd7d0c3a3148dd721350f7cf"
   solver-name = "gps-cdcl"
   solver-version = 1

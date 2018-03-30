@@ -2,6 +2,7 @@ package parser
 
 import (
 	"regexp"
+	"strconv"
 	"strings"
 )
 
@@ -12,56 +13,159 @@ type Interface interface {
 func New(whois string) Interface {
 	v, ok := whoisMap[whois]
 	if !ok {
-		return NewUglyParser()
+		return NewVGParser()
 	}
 	return v()
 }
 
 type Parser struct {
-	reg    map[int][]*regexp.Regexp
+	reg map[int]*regexp.Regexp
+	err map[string]error
 }
 
 func (p *Parser) Parse(data []byte) (wi *WhoisInfo) {
 
 	wi = &WhoisInfo{}
-	for name, regs := range p.reg {
+	for name, reg := range p.reg {
 		switch name {
 		case DomainName:
-			for _, reg := range regs {
-				value := reg.FindSubmatch(data)
-				if len(value) == 2 {
-					wi.DomainName = strings.ToLower(string(value[1]))
-				}
+			value := reg.FindSubmatch(data)
+			if len(value) == 2 {
+				wi.DomainName = strings.ToLower(string(value[1]))
 			}
 		case NameServers:
 			wi.NameServers = []string{}
-			for _, reg := range regs {
-				values := reg.FindAllSubmatch(data, -1)
-				for _, v := range values {
-					if len(v) == 2 {
-						wi.NameServers = append(wi.NameServers, string(v[1]))
-					}
+			values := reg.FindAllSubmatch(data, -1)
+			for _, v := range values {
+				if len(v) == 2 {
+					wi.NameServers = append(wi.NameServers, string(v[1]))
 				}
 			}
-		case Org:
-			for _, reg := range regs {
-				value := reg.FindSubmatch(data)
-				if len(value) == 2 {
-					wi.Org = strings.ToLower(string(value[1]))
+		case Status:
+			wi.Status = []string{}
+			values := reg.FindAllSubmatch(data, -1)
+			for _, v := range values {
+				if len(v) == 2 {
+					wi.Status = append(wi.Status, string(v[1]))
 				}
 			}
+		case ExpirationDate:
+			value := reg.FindSubmatch(data)
+			if len(value) == 2 {
+				wi.ExpirationDate = strings.TrimSpace(string(value[1]))
+			}
+		case UpdatedDate:
+			value := reg.FindSubmatch(data)
+			if len(value) == 2 {
+				wi.UpdatedDate = string(value[1])
+			}
+		case CreationDate:
+			value := reg.FindSubmatch(data)
+			if len(value) == 2 {
+				wi.CreationDate = string(value[1])
+			}
+
+		// Registrar
+		case RegistrarWhoisServer:
+			value := reg.FindSubmatch(data)
+			if len(value) == 2 {
+				wi.Registrar.WhoisServer = string(value[1])
+			}
+		case RegistrarReferralUrl:
+			value := reg.FindSubmatch(data)
+			if len(value) == 2 {
+				wi.ReferralUrl = string(value[1])
+			}
+		case RegistrarOrganization:
+			value := reg.FindSubmatch(data)
+			if len(value) == 2 {
+				wi.Registrar.Organization = string(value[1])
+			}
+		case RegistrarEmail:
+			value := reg.FindSubmatch(data)
+			if len(value) == 2 {
+				wi.Registrar.Email = string(value[1])
+			}
+		case RegistrarPhone:
+			value := reg.FindSubmatch(data)
+			if len(value) == 2 {
+				wi.Registrar.Phone = string(value[1])
+			}
+		case RegistrarIanaID:
+			value := reg.FindSubmatch(data)
+			if len(value) == 2 {
+				wi.Registrar.IanaID, _ = strconv.ParseInt(string(value[1]), 10, 0)
+			}
+		case RegistrarURL:
+			value := reg.FindSubmatch(data)
+			if len(value) == 2 {
+				wi.Registrar.URL = string(value[1])
+			}
+
+		// Registrant
+		case RegistrantName:
+			value := reg.FindSubmatch(data)
+			if len(value) == 2 {
+				wi.Registrant.Name = string(value[1])
+			}
+		case RegistrantOrganization:
+			value := reg.FindSubmatch(data)
+			if len(value) == 2 {
+				wi.Registrant.Organization = string(value[1])
+			}
+		case RegistrantAddress:
+			value := reg.FindSubmatch(data)
+			if len(value) == 2 {
+				wi.Registrant.Address = string(value[1])
+			}
+		case RegistrantCity:
+			value := reg.FindSubmatch(data)
+			if len(value) == 2 {
+				wi.Registrant.City = string(value[1])
+			}
+		case RegistrantState:
+			value := reg.FindSubmatch(data)
+			if len(value) == 2 {
+				wi.Registrant.State = string(value[1])
+			}
+		case RegistrantZipCode:
+			value := reg.FindSubmatch(data)
+			if len(value) == 2 {
+				wi.Registrant.ZipCode = string(value[1])
+			}
+		case RegistrantCountry:
+			value := reg.FindSubmatch(data)
+			if len(value) == 2 {
+				wi.Registrant.Country = string(value[1])
+			}
+		case RegistrantPhone:
+			value := reg.FindSubmatch(data)
+			if len(value) == 2 {
+				wi.Registrant.Phone = string(value[1])
+			}
+		case RegistrantFax:
+			value := reg.FindSubmatch(data)
+			if len(value) == 2 {
+				wi.Registrant.Fax = string(value[1])
+			}
+		case RegistrantEmail:
+			value := reg.FindSubmatch(data)
+			if len(value) == 2 {
+				wi.Registrant.Email = string(value[1])
+			}
+
 		case Refer:
-			for _, reg := range regs {
-				value := reg.FindSubmatch(data)
-				if len(value) == 2 {
-					wi.Refer = strings.ToLower(string(value[1]))
-				}
+			value := reg.FindSubmatch(data)
+			if len(value) == 2 {
+				wi.Refer = strings.ToLower(string(value[1]))
 			}
 		case Error:
-			for _, reg := range regs {
-				value := reg.Find(data)
-				if len(value) != 0 {
-					wi.Error = string(value)
+			value := reg.Find(data)
+			if len(value) != 0 {
+				var ok bool
+				wi.Error, ok = p.err[string(value)]
+				if !ok {
+					wi.Error = UnknownError
 				}
 			}
 		}
@@ -69,37 +173,3 @@ func (p *Parser) Parse(data []byte) (wi *WhoisInfo) {
 
 	return wi
 }
-
-/*
-				   'domain_name': 'domain: *(.+)',
-			'registrar': 'registrar: *(.+)',
-			'creation_date': 'created: *(.+)',
-			'expiration_date': 'paid-till: *(.+)',
-			'updated_date': None,
-			'name_servers': 'nserver: *(.+)',  # list of name servers
-			'status': 'state: *(.+)',  # list of statuses
-			'emails': EMAIL_REGEX,  # list of email addresses
-			'org': 'org: *(.+)'
-*/
-
-//func NewDefaultParse() *Parser {
-//	return &Parser{reg: map[string]*regexp.Regexp{
-//		`domain_name`:     regexp.MustCompile(`Domain Name`),
-//		`registrar`:       regexp.MustCompile(`Registrar: *(.+)`),
-//		`whois_server`:    regexp.MustCompile(`Whois Server: *(.+)`),
-//		`referral_url`:    regexp.MustCompile(`Referral URL: *(.+)`),
-//		`updated_date`:    regexp.MustCompile(`Updated Date: *(.+)`),
-//		`creation_date`:   regexp.MustCompile(`Creation Date: *(.+`),
-//		`expiration_date`: regexp.MustCompile(`Expir\w+ Date: *(.+)`),
-//		`name_servers`:    regexp.MustCompile(`Name Server: *(.+)`),
-//		`status`:          regexp.MustCompile(`Status: *(.+)`),
-//		`dnssec`:          regexp.MustCompile(`dnssec: *([\S]+)`),
-//		`name`:            regexp.MustCompile(`Registrant Name: *(.+)`),
-//		`org`:             regexp.MustCompile(`Registrant\s*Organization: *(.+)`),
-//		`address`:         regexp.MustCompile(`Registrant Street: *(.+)`),
-//		`city`:            regexp.MustCompile(`Registrant City: *(.+)`),
-//		`state`:           regexp.MustCompile(`Registrant State/Province: *(.+)`),
-//		`zipcode`:         regexp.MustCompile(`Registrant Postal Code: *(.+)`),
-//		`country`:         regexp.MustCompile(`Registrant Country: *(.+)`),
-//	}}
-//}
