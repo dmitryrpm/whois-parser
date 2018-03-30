@@ -1,4 +1,4 @@
-package iana_request
+package main
 
 import (
 	"net"
@@ -9,7 +9,7 @@ import (
 )
 
 func main(){
-	domain := "googla.com"
+	domain := "google.com"
 	// Do connect with connection timeout
 	connection, err := net.DialTimeout("tcp", net.JoinHostPort("whois.iana.org", "43"), 10*time.Second)
 	if err != nil {
