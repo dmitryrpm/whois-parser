@@ -4,7 +4,7 @@ Parse whois-information about domains
 ```bash
 >> go get github.com/dmitryrpm/whois-parser
 >> dep ensure
-go run cmd/do_request/main.go
+>> go run cmd/do_request/main.go
 2018/03/31 02:52:14 result parse domain: [google.com], to whois server: [whois.markmonitor.com]  
 ```
 
