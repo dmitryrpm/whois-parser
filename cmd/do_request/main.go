@@ -12,7 +12,7 @@ import (
 
 func main() {
 	domain := "google.com"
-	whoisServer := "whois.safenames.net"
+	whoisServer := "whois.markmonitor.com"
 	// Do connect with connection timeout
 	connection, err := net.DialTimeout("tcp", net.JoinHostPort(whoisServer, "43"), 10*time.Second)
 	if err != nil {
@@ -27,7 +27,7 @@ func main() {
 
 	// Wait an answer timeout
 	b, err := ioutil.ReadAll(connection)
-	p := parser.New("")
+	p := parser.New(whoisServer)
 	parseObj := p.Parse(b)
 
 	json, err := prettyjson.Marshal(parseObj)
@@ -37,6 +37,6 @@ func main() {
 		log.Fatal(err)
 	}
 
-	log.Println(string(json))
+	log.Printf("result parse domain: [%s], to whois server: [%s] \n%s", domain, whoisServer, json)
 
 }
