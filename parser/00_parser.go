@@ -5,14 +5,6 @@ import (
 	"strings"
 )
 
-const (
-	DomainName = iota
-	NameServers
-	Org
-	Refer
-	Error
-)
-
 type Interface interface {
 	Parse(data []byte) (wi *WhoisInfo)
 }
@@ -25,14 +17,8 @@ func New(whois string) Interface {
 	return v()
 }
 
-
 type Parser struct {
 	reg    map[int][]*regexp.Regexp
-}
-
-var whoisMap = map[string]func() Interface{
-	`whois.tcinet.ru`: NewTcinetRuParser,
-	`whois.iana.org`: NewIana,
 }
 
 func (p *Parser) Parse(data []byte) (wi *WhoisInfo) {
@@ -83,17 +69,6 @@ func (p *Parser) Parse(data []byte) (wi *WhoisInfo) {
 
 	return wi
 }
-
-type WhoisInfo struct {
-	DomainName  string
-	NameServers []string
-	Org         string
-	Refer      string
-	Error      string
-}
-
-
-
 
 /*
 				   'domain_name': 'domain: *(.+)',
