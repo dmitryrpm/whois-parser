@@ -1,18 +1,49 @@
 package main
 
 import (
+	"encoding/json"
+	"fmt"
 	"io/ioutil"
 	"log"
 	"net"
+	"strings"
 	"time"
 
+	"os"
+
 	"github.com/dmitryrpm/whois-parser/parser"
-	prettyjson "github.com/hokaccha/go-prettyjson"
+	"github.com/hokaccha/go-prettyjson"
 )
 
 func main() {
-	domain := "google.com"
-	whoisServer := "whois.markmonitor.com"
+	domain := os.Args[1]
+	log.Printf("get info for domain: %s", domain)
+	jsonBytes, err := ioutil.ReadFile("./data/tld/tld.json")
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	var f map[string]map[string]string
+	err = json.Unmarshal(jsonBytes, &f)
+	if err != nil {
+		fmt.Println("Error parsing JSON: ", err)
+	}
+
+	found := ""
+	for k := range f {
+		if strings.HasSuffix(domain, "."+k) {
+			if len(found) < len(k) {
+				found = k
+			}
+		}
+	}
+
+	whoisServer, ok := f[found]["host"]
+	if !ok {
+		log.Fatal("not found whois service for host")
+	}
+	log.Printf("found whois server: %#v", whoisServer)
+
 	// Do connect with connection timeout
 	connection, err := net.DialTimeout("tcp", net.JoinHostPort(whoisServer, "43"), 10*time.Second)
 	if err != nil {

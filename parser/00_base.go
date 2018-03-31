@@ -52,25 +52,25 @@ var whoisMap = map[string]func() Interface{
 }
 
 type WhoisRegistrar struct {
-	WhoisServer  string
-	URL          string
-	IanaID       int64
-	Email        string
-	Phone        string
-	Organization string
+	WhoisServer  string `json:"whois_server,omitempty"`
+	URL          string `json:"url,omitempty"`
+	IanaID       int64  `json:"iana_id,omitempty"`
+	Email        string `json:"email,omitempty"`
+	Phone        string `json:"phone,omitempty"`
+	Organization string `json:"organization,omitempty"`
 }
 
 type WhoisRegistrant struct {
-	Name         string
-	Organization string
-	Address      string
-	City         string
-	State        string
-	ZipCode      string
-	Country      string
-	Phone        string
-	Fax          string
-	Email        string
+	Name         string `json:"name,omitempty"`
+	Organization string `json:"organization,omitempty"`
+	Address      string `json:"address,omitempty"`
+	City         string `json:"city,omitempty"`
+	State        string `json:"state,omitempty"`
+	ZipCode      string `json:"zip_code,omitempty"`
+	Country      string `json:"country,omitempty"`
+	Phone        string `json:"phone,omitempty"`
+	Fax          string `json:"fax,omitempty"`
+	Email        string `json:"email,omitempty"`
 }
 
 type WhoisInfo struct {
@@ -80,8 +80,8 @@ type WhoisInfo struct {
 	UpdatedDate    string   `json:"update_date,omitempty"`
 	ExpirationDate string   `json:"expiration_date,omitempty"`
 
-	Registrar  WhoisRegistrar
-	Registrant WhoisRegistrant
+	Registrar  WhoisRegistrar  `json:"registrar,omitempty"`
+	Registrant WhoisRegistrant `json:"registrant,omitempty"`
 
 	Status      []string `json:"status,omitempty"`
 	Refer       string   `json:"refer,omitempty"`
